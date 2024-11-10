@@ -1,0 +1,32 @@
+module hazard_lights (wind, reset, clk, lights);
+	input logic [1:0] wind;
+	input logic reset, clk;
+	output logic [2:0] lights;
+	
+	enum {ozo, zoz, ozz, zzo} ps, ns;
+	
+	always_comb begin
+		case (ps)
+			ozo:								ns = zoz;
+			zoz:	if (wind == 0) 		ns = ozo;
+					else if (wind == 1)	ns = ;
+					else						ns = ;
+	end
+	
+	always_comb begin // can i put these into 1 always_comb block
+		case (ps)
+			ozo: lights = 3'b101;
+			zoz: lights = 3'b010;
+			ozz: lights = 3'b100;
+			zzo: lights = 3'b001;
+		endcase
+	end
+	
+	always_ff @(posedge clk) begin
+		if (reset)
+			ps <= zoz; // defaults to 010 state when reset
+		else
+			ps <= ns;
+	end
+
+endmodule
